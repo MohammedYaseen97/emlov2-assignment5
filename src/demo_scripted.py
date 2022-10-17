@@ -29,21 +29,18 @@ def demo(cfg: DictConfig) -> Tuple[dict, dict]:
         Tuple[dict, dict]: Dict with metrics and dict with all instantiated objects.
     """
 
-    BUCKET_NAME = 'emlov2-s3-yaseen' # replace with your bucket name
-    KEY = 'test_folder' # replace with your object key
+    s3 = boto3.client('s3')
 
-    s3 = boto3.resource('s3')
-
-    s3.Bucket(BUCKET_NAME).download_file(KEY, 'my_local_image.jpg')
+    s3.download_file(Bucket="emlov2-s3-yaseen", Key="test-folder/model.script.pt", Filename="local_model.script.pt")
 
     log.info("Running Demo")
 
-    log.info(f"Instantiating scripted model <{cfg.ckpt_path}>")
-    model = torch.jit.load(cfg.ckpt_path)
+    log.info(f"Instantiating scripted model 'local_model.script.pt'")
+    model = torch.jit.load('local_model.script.pt')
 
     log.info(f"Loaded Model: {model}")
 
-    classes = ('plane', 'car', 'bird', 'cat',
+    classes = ('plane', 'automobile', 'bird', 'cat',
            'deer', 'dog', 'frog', 'horse', 'ship', 'truck')
 
     def recognize_cifar(image):
@@ -63,7 +60,7 @@ def demo(cfg: DictConfig) -> Tuple[dict, dict]:
         outputs=[gr.Label(num_top_classes=10)]
     )
 
-    demo.launch(server_name="0.0.0.0", server_port=8080)
+    demo.launch(server_name="0.0.0.0")
 
 @hydra.main(
     version_base="1.2", config_path=root / "configs", config_name="demo_scripted_s3.yaml"

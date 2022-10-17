@@ -1,6 +1,8 @@
 # our base image
 FROM python:3.8-slim
 
+ENV GRADIO_SERVER_PORT 80
+
 # set working directory inside the image
 WORKDIR /opt/src
 
@@ -14,7 +16,7 @@ RUN pip install -r requirements.txt && rm -rf /root/.cache/pip
 COPY . .
 
 # expose the port
-EXPOSE 8080
+EXPOSE 80
 
 # run the scripted model
-ENTRYPOINT ["python3", "src/demo_scripted.py", "ckpt_path=logs/train/runs/2022-10-01_04-48-47/model.script.pt"]
+ENTRYPOINT ["python3", "src/demo_scripted.py"]
